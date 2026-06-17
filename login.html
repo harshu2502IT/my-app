@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #f5f5f4; font-family: sans-serif; }
+    .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 14px; padding: 2.5rem 2rem; width: 100%; max-width: 400px; }
+    .logo { width: 40px; height: 40px; background: #4F46E5; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; }
+    .logo i { color: #fff; font-size: 22px; }
+    h2 { text-align: center; font-size: 22px; font-weight: 600; color: #111; margin-bottom: 0.25rem; }
+    .subtitle { text-align: center; font-size: 14px; color: #6b7280; margin-bottom: 2rem; }
+    .tabs { display: flex; background: #f3f4f6; border-radius: 8px; padding: 4px; margin-bottom: 1.5rem; gap: 4px; }
+    .tab { flex: 1; padding: 8px; border: none; background: transparent; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; color: #6b7280; transition: all 0.15s; }
+    .tab.active { background: #fff; color: #111; border: 1px solid #e5e7eb; }
+    label { display: block; font-size: 13px; font-weight: 500; color: #374151; margin-bottom: 6px; }
+    .field { margin-bottom: 1rem; }
+    .input-wrap { position: relative; }
+    .input-wrap i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 16px; color: #9ca3af; pointer-events: none; }
+    input[type=email], input[type=password] { width: 100%; padding: 10px 12px 10px 38px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 15px; color: #111; outline: none; }
+    input:focus { border-color: #4F46E5; box-shadow: 0 0 0 3px rgba(79,70,229,0.12); }
+    .btn { width: 100%; padding: 11px; background: #4F46E5; color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 500; cursor: pointer; margin-top: 0.5rem; }
+    .btn:hover { background: #4338CA; }
+    .msg { margin-top: 1rem; padding: 10px 14px; border-radius: 8px; font-size: 13px; text-align: center; display: none; }
+    .msg.error { background: #fef2f2; color: #b91c1c; display: block; }
+    .msg.success { background: #f0fdf4; color: #15803d; display: block; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo"><i class="ti ti-bolt"></i></div>
+    <h2>Welcome back</h2>
+    <p class="subtitle">Sign in to your account to continue</p>
+
+    <div class="tabs">
+      <button class="tab active" onclick="setTab('login', this)">Login</button>
+      <button class="tab" onclick="setTab('signup', this)">Sign Up</button>
+    </div>
+
+    <div id="login-form">
+      <div class="field">
+        <label>Email address</label>
+        <div class="input-wrap">
+          <i class="ti ti-mail"></i>
+          <input type="email" id="login-email" placeholder="you@example.com" />
+        </div>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <div class="input-wrap">
+          <i class="ti ti-lock"></i>
+          <input type="password" id="login-password" placeholder="••••••••" />
+        </div>
+      </div>
+      <button class="btn" onclick="login()">Sign in</button>
+    </div>
+
+    <div id="signup-form" style="display:none">
+      <div class="field">
+        <label>Email address</label>
+        <div class="input-wrap">
+          <i class="ti ti-mail"></i>
+          <input type="email" id="signup-email" placeholder="you@example.com" />
+        </div>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <div class="input-wrap">
+          <i class="ti ti-lock"></i>
+          <input type="password" id="signup-password" placeholder="Min. 6 characters" />
+        </div>
+      </div>
+      <button class="btn" onclick="signup()">Create account</button>
+    </div>
+
+    <p class="msg" id="msg"></p>
+  </div>
+
+  <script src="auth.js"></script>
+  <script>
+    function setTab(t, el) {
+      document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'))
+      el.classList.add('active')
+      document.getElementById('login-form').style.display = t === 'login' ? 'block' : 'none'
+      document.getElementById('signup-form').style.display = t === 'signup' ? 'block' : 'none'
+      document.getElementById('msg').className = 'msg'
+    }
+
+    async function login() {
+      const email = document.getElementById('login-email').value
+      const password = document.getElementById('login-password').value
+      const msg = document.getElementById('msg')
+
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password })
+
+      if (error) {
+        msg.textContent = error.message
+        msg.className = 'msg error'
+      } else {
+        window.location.href = 'dashboard.html'
+      }
+    }
+
+    async function signup() {
+      const email = document.getElementById('signup-email').value
+      const password = document.getElementById('signup-password').value
+      const msg = document.getElementById('msg')
+
+      const { data, error } = await supabaseClient.auth.signUp({ email, password })
+
+      if (error) {
+        msg.textContent = error.message
+        msg.className = 'msg error'
+      } else {
+        msg.textContent = 'Account created! You can now log in.'
+        msg.className = 'msg success'
+      }
+    }
+  </script>
+</body>
+</html>
