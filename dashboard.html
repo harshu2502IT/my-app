@@ -2,26 +2,100 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Dashboard</title>
+  <title>MediStore – Dashboard</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="auth.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { min-height: 100vh; background: #f0f4f8; font-family: sans-serif; }
+    .topbar { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px; color: #0f172a; }
+    .brand-icon { width: 34px; height: 34px; background: #0EA5E9; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+    .brand-icon i { color: #fff; font-size: 18px; }
+    .user-section { display: flex; align-items: center; gap: 12px; }
+    .user-email { font-size: 13px; color: #475569; }
+    .logout-btn { display: flex; align-items: center; gap: 5px; padding: 7px 14px; border: 1px solid #fecaca; background: #fff; border-radius: 8px; font-size: 13px; color: #ef4444; cursor: pointer; font-weight: 500; }
+    .logout-btn:hover { background: #FEF2F2; }
+    .main { padding: 24px; max-width: 1000px; margin: 0 auto; }
+    .welcome-banner { background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 12px; padding: 14px 18px; display: flex; align-items: center; gap: 10px; font-size: 14px; color: #1D4ED8; margin-bottom: 1.5rem; }
+    .welcome-banner i { font-size: 18px; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 1.5rem; }
+    .stat-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; }
+    .stat-label { font-size: 12px; color: #64748b; margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
+    .stat-label i { font-size: 14px; }
+    .stat-value { font-size: 26px; font-weight: 700; }
+    .stat-value.blue { color: #0EA5E9; }
+    .stat-value.green { color: #22c55e; }
+    .stat-value.amber { color: #f59e0b; }
+    .stat-value.red { color: #ef4444; }
+    .section-title { font-size: 15px; font-weight: 600; color: #0f172a; margin-bottom: 12px; }
+    .info-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px 20px; }
+    .info-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f1f5f9; font-size: 14px; color: #475569; }
+    .info-row:last-child { border-bottom: none; }
+    .info-row i { font-size: 16px; color: #0EA5E9; width: 20px; }
+    .info-row span { color: #0f172a; font-weight: 500; margin-left: auto; }
+  </style>
 </head>
 <body>
-  <h1>Welcome to Dashboard!</h1>
-  <p id="user-email">Loading...</p>
-  <button onclick="logout()">Logout</button>
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-icon"><i class="ti ti-heart-rate-monitor"></i></div>
+      MediStore
+    </div>
+    <div class="user-section">
+      <span class="user-email" id="user-email">Loading...</span>
+      <button class="logout-btn" onclick="logout()">
+        <i class="ti ti-logout"></i> Logout
+      </button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="welcome-banner">
+      <i class="ti ti-circle-check"></i>
+      <span>Welcome back, Doctor. Your session is active and secure.</span>
+    </div>
+
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-label"><i class="ti ti-users"></i> Total Patients</div>
+        <div class="stat-value blue">248</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label"><i class="ti ti-file-text"></i> Medical Records</div>
+        <div class="stat-value green">1,842</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label"><i class="ti ti-calendar"></i> Appointments</div>
+        <div class="stat-value amber">12</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label"><i class="ti ti-alert-triangle"></i> Alerts</div>
+        <div class="stat-value red">3</div>
+      </div>
+    </div>
+
+    <div class="section-title">Account information</div>
+    <div class="info-card">
+      <div class="info-row"><i class="ti ti-mail"></i> Email <span id="info-email">—</span></div>
+      <div class="info-row"><i class="ti ti-shield-check"></i> Role <span>Medical Staff</span></div>
+      <div class="info-row"><i class="ti ti-clock"></i> Session <span>Active</span></div>
+      <div class="info-row"><i class="ti ti-lock"></i> Security <span>Encrypted</span></div>
+    </div>
+  </div>
 
   <script>
     async function checkSession() {
-  const { data: { session } } = await supabaseClient.auth.getSession()
-
-  if (!session) {
-    localStorage.removeItem('token')  // ← ADD this line
-    window.location.href = 'login.html'
-  } else {
-    document.getElementById('user-email').textContent = 'Logged in as: ' + session.user.email
-  }
-}
+      const { data: { session } } = await supabaseClient.auth.getSession()
+      if (!session) {
+        localStorage.removeItem('token')
+        window.location.href = 'login.html'
+      } else {
+        document.getElementById('user-email').textContent = session.user.email
+        document.getElementById('info-email').textContent = session.user.email
+      }
+    }
 
     async function logout() {
       await supabaseClient.auth.signOut()
@@ -30,15 +104,10 @@
 
     checkSession()
 
-  supabaseClient.auth.onAuthStateChange((event, session) => {
-  if (event === 'TOKEN_REFRESHED') {
-    localStorage.setItem('token', session.access_token)
-  }
-  if (event === 'SIGNED_OUT') {
-    localStorage.removeItem('token')
-    window.location.href = 'login.html'
-  }
-})
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+      if (event === 'TOKEN_REFRESHED') localStorage.setItem('token', session.access_token)
+      if (event === 'SIGNED_OUT') { localStorage.removeItem('token'); window.location.href = 'login.html' }
+    })
   </script>
 </body>
 </html>
