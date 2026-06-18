@@ -100,9 +100,10 @@
         msg.textContent = error.message
         msg.className = 'msg error'
       } else {
+        localStorage.setItem('token', data.session.access_token)
         window.location.href = 'dashboard.html'
       }
-    }
+      }
 
     async function signup() {
       const email = document.getElementById('signup-email').value

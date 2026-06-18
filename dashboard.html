@@ -13,14 +13,15 @@
 
   <script>
     async function checkSession() {
-      const { data: { session } } = await supabaseClient.auth.getSession()
-      
-      if (!session) {
-        window.location.href = 'login.html'
-      } else {
-        document.getElementById('user-email').textContent = 'Logged in as: ' + session.user.email
-      }
-    }
+  const { data: { session } } = await supabaseClient.auth.getSession()
+
+  if (!session) {
+    localStorage.removeItem('token')  // ← ADD this line
+    window.location.href = 'login.html'
+  } else {
+    document.getElementById('user-email').textContent = 'Logged in as: ' + session.user.email
+  }
+}
 
     async function logout() {
       await supabaseClient.auth.signOut()
@@ -28,6 +29,16 @@
     }
 
     checkSession()
+
+  supabaseClient.auth.onAuthStateChange((event, session) => {
+  if (event === 'TOKEN_REFRESHED') {
+    localStorage.setItem('token', session.access_token)
+  }
+  if (event === 'SIGNED_OUT') {
+    localStorage.removeItem('token')
+    window.location.href = 'login.html'
+  }
+})
   </script>
 </body>
 </html>
