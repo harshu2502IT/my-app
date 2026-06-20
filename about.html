@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MediStore – About Us</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; background: #f0f4f8; color: #0f172a; }
+    a { text-decoration: none; color: inherit; }
+
+    .topbar { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px; }
+    .brand-icon { width: 34px; height: 34px; background: #0EA5E9; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+    .brand-icon i { color: #fff; font-size: 18px; }
+    .nav { display: flex; gap: 28px; font-size: 14px; color: #475569; }
+    .nav a:hover, .nav a.active { color: #0EA5E9; font-weight: 600; }
+    .right-section { display: flex; align-items: center; gap: 16px; }
+    .cart-link { position: relative; display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border: 1px solid #e2e8f0; border-radius: 8px; }
+    .cart-badge { position: absolute; top: -6px; right: -6px; background: #ef4444; color: #fff; font-size: 10px; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; }
+    .auth-link { font-size: 13px; padding: 7px 16px; border-radius: 8px; border: 1px solid #e2e8f0; }
+    .auth-link.primary { background: #0EA5E9; color: #fff; border: none; }
+
+    .about-hero { max-width: 640px; margin: 50px auto 10px; text-align: center; padding: 0 24px; }
+    .about-hero i { font-size: 44px; color: #0EA5E9; margin-bottom: 14px; display: block; }
+    .about-hero h1 { font-size: 26px; margin-bottom: 12px; }
+    .about-hero p { font-size: 14px; color: #64748b; line-height: 1.7; }
+
+    .stats-row { max-width: 700px; margin: 32px auto; padding: 0 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .about-stat { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; text-align: center; }
+    .about-stat-val { font-size: 24px; font-weight: 700; color: #0EA5E9; }
+    .about-stat-label { font-size: 12px; color: #64748b; margin-top: 4px; }
+
+    .values { max-width: 900px; margin: 40px auto; padding: 0 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .value-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 22px; }
+    .value-card i { font-size: 26px; color: #0EA5E9; margin-bottom: 10px; display: block; }
+    .value-card h3 { font-size: 15px; margin-bottom: 6px; }
+    .value-card p { font-size: 12px; color: #64748b; line-height: 1.6; }
+
+    .contact-section { max-width: 640px; margin: 50px auto 60px; padding: 0 24px; text-align: center; }
+    .contact-section h2 { font-size: 18px; margin-bottom: 8px; }
+    .contact-section p { font-size: 13px; color: #64748b; margin-bottom: 20px; }
+    .contact-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .contact-item { display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 16px; font-size: 13px; }
+    .contact-item i { color: #0EA5E9; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand"><div class="brand-icon"><i class="ti ti-heart-rate-monitor"></i></div>MediStore</div>
+    <div class="nav">
+      <a href="index.html">Home</a>
+      <a href="shop.html">Shop</a>
+      <a href="about.html" class="active">About</a>
+    </div>
+    <div class="right-section">
+      <a href="cart.html" class="cart-link">
+        <i class="ti ti-shopping-cart" style="font-size:16px;color:#475569"></i>
+        <span class="cart-badge" id="cart-count" style="display:none">0</span>
+      </a>
+      <div id="auth-area"></div>
+    </div>
+  </div>
+
+  <div class="about-hero">
+    <i class="ti ti-heart-rate-monitor"></i>
+    <h1>About MediStore</h1>
+    <p>We're committed to making genuine medicines and medical supplies accessible to everyone. Every product on our platform is verified, every order is handled securely, and every customer's data is protected — because health deserves nothing less than trust.</p>
+  </div>
+
+  <div class="stats-row">
+    <div class="about-stat"><div class="about-stat-val">10,000+</div><div class="about-stat-label">Happy customers</div></div>
+    <div class="about-stat"><div class="about-stat-val">500+</div><div class="about-stat-label">Verified products</div></div>
+    <div class="about-stat"><div class="about-stat-val">24/7</div><div class="about-stat-label">Customer support</div></div>
+  </div>
+
+  <div class="values">
+    <div class="value-card">
+      <i class="ti ti-shield-check"></i>
+      <h3>Verified quality</h3>
+      <p>Every medicine listed is sourced from licensed suppliers and checked for authenticity.</p>
+    </div>
+    <div class="value-card">
+      <i class="ti ti-lock"></i>
+      <h3>Data security</h3>
+      <p>Your account, orders, and personal information are protected with encrypted authentication.</p>
+    </div>
+    <div class="value-card">
+      <i class="ti ti-heart"></i>
+      <h3>Patient first</h3>
+      <p>We build every feature around making healthcare simpler and more accessible for you.</p>
+    </div>
+  </div>
+
+  <div class="contact-section">
+    <h2>Get in touch</h2>
+    <p>Have a question? We'd love to hear from you.</p>
+    <div class="contact-row">
+      <div class="contact-item"><i class="ti ti-mail"></i>support@medistore.com</div>
+      <div class="contact-item"><i class="ti ti-phone"></i>+91 98765 43210</div>
+      <div class="contact-item"><i class="ti ti-map-pin"></i>Mumbai, India</div>
+    </div>
+  </div>
+
+  <script>
+    async function renderAuthArea() {
+      const { data: { session } } = await supabaseClient.auth.getSession()
+      const area = document.getElementById('auth-area')
+      if (session) {
+        area.innerHTML = `<a href="dashboard.html" class="auth-link primary">Dashboard</a>`
+      } else {
+        area.innerHTML = `<a href="login.html" class="auth-link">Login</a>`
+      }
+    }
+
+    async function updateCartCount() {
+      const { data: { session } } = await supabaseClient.auth.getSession()
+      const badge = document.getElementById('cart-count')
+      if (!session) { badge.style.display = 'none'; return }
+      const { data, error } = await supabaseClient
+        .from('cart_items')
+        .select('quantity')
+        .eq('user_id', session.user.id)
+      if (error || !data || data.length === 0) { badge.style.display = 'none'; return }
+      const total = data.reduce((sum, item) => sum + item.quantity, 0)
+      badge.textContent = total
+      badge.style.display = 'flex'
+    }
+
+    renderAuthArea()
+    updateCartCount()
+  </script>
+</body>
+</html>

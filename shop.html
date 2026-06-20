@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MediStore – Shop</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; background: #f0f4f8; color: #0f172a; }
+    a { text-decoration: none; color: inherit; }
+
+    .topbar { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px; }
+    .brand-icon { width: 34px; height: 34px; background: #0EA5E9; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+    .brand-icon i { color: #fff; font-size: 18px; }
+    .nav { display: flex; gap: 28px; font-size: 14px; color: #475569; }
+    .nav a:hover, .nav a.active { color: #0EA5E9; font-weight: 600; }
+    .right-section { display: flex; align-items: center; gap: 16px; }
+    .cart-link { position: relative; display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border: 1px solid #e2e8f0; border-radius: 8px; }
+    .cart-badge { position: absolute; top: -6px; right: -6px; background: #ef4444; color: #fff; font-size: 10px; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; }
+    .auth-link { font-size: 13px; padding: 7px 16px; border-radius: 8px; border: 1px solid #e2e8f0; }
+    .auth-link.primary { background: #0EA5E9; color: #fff; border: none; }
+
+    .page-head { max-width: 1000px; margin: 28px auto 18px; padding: 0 24px; }
+    .page-head h1 { font-size: 22px; margin-bottom: 14px; }
+    .search-bar { display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 14px; max-width: 360px; }
+    .search-bar i { color: #94a3b8; font-size: 16px; }
+    .search-bar input { border: none; outline: none; font-size: 13px; flex: 1; }
+
+    .category-row { max-width: 1000px; margin: 0 auto 18px; padding: 0 24px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .cat-pill { font-size: 12px; padding: 6px 14px; border-radius: 20px; border: 1px solid #e2e8f0; background: #fff; cursor: pointer; color: #475569; }
+    .cat-pill.active { background: #0EA5E9; color: #fff; border-color: #0EA5E9; }
+
+    .prod-grid { max-width: 1000px; margin: 0 auto 48px; padding: 0 24px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .prod-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; }
+    .prod-img { width: 100%; height: 80px; background: #EFF6FF; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
+    .prod-img i { font-size: 30px; color: #0EA5E9; }
+    .prod-name { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+    .prod-cat { font-size: 11px; color: #64748b; margin-bottom: 6px; }
+    .prod-desc { font-size: 11px; color: #94a3b8; margin-bottom: 10px; line-height: 1.4; }
+    .prod-bottom { display: flex; align-items: center; justify-content: space-between; }
+    .prod-price { font-size: 15px; font-weight: 700; color: #0EA5E9; }
+    .add-btn { background: #0EA5E9; color: #fff; border: none; border-radius: 6px; font-size: 12px; padding: 7px 10px; display: flex; align-items: center; gap: 4px; cursor: pointer; }
+    .add-btn:hover { background: #0284C7; }
+    .add-btn:disabled { background: #94a3b8; cursor: default; }
+
+    .empty-state { max-width: 1000px; margin: 60px auto; text-align: center; color: #64748b; font-size: 13px; }
+
+    .toast { position: fixed; bottom: 24px; right: 24px; background: #0f172a; color: #fff; padding: 12px 18px; border-radius: 10px; font-size: 13px; display: none; align-items: center; gap: 8px; z-index: 100; }
+    .toast.show { display: flex; }
+    .toast i { color: #22c55e; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand"><div class="brand-icon"><i class="ti ti-heart-rate-monitor"></i></div>MediStore</div>
+    <div class="nav">
+      <a href="index.html">Home</a>
+      <a href="shop.html" class="active">Shop</a>
+      <a href="about.html">About</a>
+    </div>
+    <div class="right-section">
+      <a href="cart.html" class="cart-link">
+        <i class="ti ti-shopping-cart" style="font-size:16px;color:#475569"></i>
+        <span class="cart-badge" id="cart-count" style="display:none">0</span>
+      </a>
+      <div id="auth-area"></div>
+    </div>
+  </div>
+
+  <div class="page-head">
+    <h1>Browse our products</h1>
+    <div class="search-bar">
+      <i class="ti ti-search"></i>
+      <input type="text" id="search-input" placeholder="Search medicines, supplements..." oninput="filterProducts()" />
+    </div>
+  </div>
+
+  <div class="category-row" id="category-row"></div>
+
+  <div class="prod-grid" id="product-grid"></div>
+  <div class="empty-state" id="empty-state" style="display:none">No products match your search.</div>
+
+  <div class="toast" id="toast"><i class="ti ti-circle-check"></i><span id="toast-text">Added to cart</span></div>
+
+  <script>
+    let allProducts = []
+    let activeCategory = 'All'
+
+    async function renderAuthArea() {
+      const { data: { session } } = await supabaseClient.auth.getSession()
+      const area = document.getElementById('auth-area')
+      if (session) {
+        area.innerHTML = `<a href="dashboard.html" class="auth-link primary">Dashboard</a>`
+      } else {
+        area.innerHTML = `<a href="login.html" class="auth-link">Login</a>`
+      }
+    }
+
+    async function updateCartCount() {
+      const { data: { session } } = await supabaseClient.auth.getSession()
+      const badge = document.getElementById('cart-count')
+      if (!session) { badge.style.display = 'none'; return }
+      const { data, error } = await supabaseClient
+        .from('cart_items')
+        .select('quantity')
+        .eq('user_id', session.user.id)
+      if (error || !data || data.length === 0) { badge.style.display = 'none'; return }
+      const total = data.reduce((sum, item) => sum + item.quantity, 0)
+      badge.textContent = total
+      badge.style.display = 'flex'
+    }
+
+    function showToast(text) {
+      const toast = document.getElementById('toast')
+      document.getElementById('toast-text').textContent = text
+      toast.classList.add('show')
+      setTimeout(() => toast.classList.remove('show'), 2200)
+    }
+
+    async function addToCart(productId, btn) {
+      const { data: { session } } = await supabaseClient.auth.getSession()
+      if (!session) {
+        window.location.href = 'login.html'
+        return
+      }
+
+      btn.disabled = true
+      btn.textContent = 'Adding...'
+
+      const { data: existing } = await supabaseClient
+        .from('cart_items')
+        .select('id, quantity')
+        .eq('user_id', session.user.id)
+        .eq('product_id', productId)
+        .maybeSingle()
+
+      if (existing) {
+        await supabaseClient
+          .from('cart_items')
+          .update({ quantity: existing.quantity + 1 })
+          .eq('id', existing.id)
+      } else {
+        await supabaseClient
+          .from('cart_items')
+          .insert({ user_id: session.user.id, product_id: productId, quantity: 1 })
+      }
+
+      btn.disabled = false
+      btn.innerHTML = '<i class="ti ti-plus" style="font-size:13px"></i>Add'
+      showToast('Added to cart')
+      updateCartCount()
+    }
+
+    function renderCategories() {
+      const categories = ['All', ...new Set(allProducts.map(p => p.category))]
+      const row = document.getElementById('category-row')
+      row.innerHTML = categories.map(c =>
+        `<button class="cat-pill ${c === activeCategory ? 'active' : ''}" onclick="setCategory('${c}')">${c}</button>`
+      ).join('')
+    }
+
+    function setCategory(cat) {
+      activeCategory = cat
+      renderCategories()
+      filterProducts()
+    }
+
+    function filterProducts() {
+      const search = document.getElementById('search-input').value.toLowerCase()
+      const filtered = allProducts.filter(p => {
+        const matchesCategory = activeCategory === 'All' || p.category === activeCategory
+        const matchesSearch = p.name.toLowerCase().includes(search) || p.category.toLowerCase().includes(search)
+        return matchesCategory && matchesSearch
+      })
+      renderProducts(filtered)
+    }
+
+    function renderProducts(products) {
+      const grid = document.getElementById('product-grid')
+      const empty = document.getElementById('empty-state')
+
+      if (products.length === 0) {
+        grid.innerHTML = ''
+        empty.style.display = 'block'
+        return
+      }
+      empty.style.display = 'none'
+
+      grid.innerHTML = products.map(p => `
+        <div class="prod-card">
+          <div class="prod-img"><i class="ti ${p.icon || 'ti-pill'}"></i></div>
+          <div class="prod-name">${p.name}</div>
+          <div class="prod-cat">${p.category}</div>
+          <div class="prod-desc">${p.description || ''}</div>
+          <div class="prod-bottom">
+            <span class="prod-price">₹${p.price}</span>
+            <button class="add-btn" onclick="addToCart(${p.id}, this)"><i class="ti ti-plus" style="font-size:13px"></i>Add</button>
+          </div>
+        </div>
+      `).join('')
+    }
+
+    async function loadProducts() {
+      const { data: products, error } = await supabaseClient
+        .from('products')
+        .select('*')
+        .order('name')
+
+      if (error || !products) {
+        document.getElementById('product-grid').innerHTML = '<p style="color:#64748b;font-size:13px">Could not load products.</p>'
+        return
+      }
+
+      allProducts = products
+      renderCategories()
+      renderProducts(allProducts)
+    }
+
+    renderAuthArea()
+    updateCartCount()
+    loadProducts()
+  </script>
+</body>
+</html>

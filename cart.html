@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MediStore – Cart</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; background: #f0f4f8; color: #0f172a; }
+    a { text-decoration: none; color: inherit; }
+
+    .topbar { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px; }
+    .brand-icon { width: 34px; height: 34px; background: #0EA5E9; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+    .brand-icon i { color: #fff; font-size: 18px; }
+    .nav { display: flex; gap: 28px; font-size: 14px; color: #475569; }
+    .nav a:hover, .nav a.active { color: #0EA5E9; font-weight: 600; }
+    .right-section { display: flex; align-items: center; gap: 16px; }
+    .cart-link { position: relative; display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border: 1px solid #e2e8f0; border-radius: 8px; }
+    .cart-badge { position: absolute; top: -6px; right: -6px; background: #ef4444; color: #fff; font-size: 10px; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; }
+    .auth-link { font-size: 13px; padding: 7px 16px; border-radius: 8px; border: 1px solid #e2e8f0; }
+    .auth-link.primary { background: #0EA5E9; color: #fff; border: none; }
+
+    .main { max-width: 760px; margin: 28px auto 60px; padding: 0 24px; }
+    .main h1 { font-size: 22px; margin-bottom: 20px; }
+
+    .cart-item { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+    .cart-item-img { width: 48px; height: 48px; background: #EFF6FF; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .cart-item-img i { font-size: 22px; color: #0EA5E9; }
+    .cart-item-info { flex: 1; }
+    .cart-item-name { font-size: 14px; font-weight: 600; }
+    .cart-item-cat { font-size: 11px; color: #94a3b8; margin-top: 1px; }
+
+    .qty-control { display: flex; align-items: center; gap: 8px; border: 1px solid #e2e8f0; border-radius: 8px; padding: 4px 8px; }
+    .qty-btn { width: 22px; height: 22px; border: none; background: #f1f5f9; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+    .qty-val { font-size: 13px; font-weight: 600; min-width: 16px; text-align: center; }
+
+    .cart-item-price { font-size: 14px; font-weight: 700; color: #0EA5E9; min-width: 64px; text-align: right; }
+    .del-btn { width: 32px; height: 32px; border-radius: 8px; border: 1px solid #fecaca; background: #fff; color: #ef4444; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+    .del-btn:hover { background: #FEF2F2; }
+
+    .summary { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px 20px; margin-top: 18px; }
+    .summary-row { display: flex; justify-content: space-between; font-size: 13px; color: #475569; margin-bottom: 8px; }
+    .summary-total { display: flex; justify-content: space-between; font-size: 16px; font-weight: 700; padding-top: 10px; border-top: 1px solid #f1f5f9; }
+    .checkout-btn { width: 100%; margin-top: 14px; background: #0EA5E9; color: #fff; border: none; border-radius: 8px; padding: 12px; font-size: 14px; font-weight: 600; cursor: pointer; }
+    .checkout-btn:hover { background: #0284C7; }
+
+    .empty-cart { text-align: center; padding: 60px 20px; color: #64748b; }
+    .empty-cart i { font-size: 40px; color: #cbd5e1; margin-bottom: 12px; display: block; }
+    .empty-cart a { color: #0EA5E9; font-weight: 600; }
+
+    .undo-banner { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #0f172a; color: #fff; padding: 12px 18px; border-radius: 10px; font-size: 13px; display: none; align-items: center; gap: 16px; z-index: 100; box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+    .undo-banner.show { display: flex; }
+    .undo-link { color: #38BDF8; font-weight: 700; cursor: pointer; background: none; border: none; font-size: 13px; }
+
+    .login-prompt { text-align: center; padding: 60px 20px; color: #64748b; }
+    .login-prompt a { color: #0EA5E9; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand"><div class="brand-icon"><i class="ti ti-heart-rate-monitor"></i></div>MediStore</div>
+    <div class="nav">
+      <a href="index.html">Home</a>
+      <a href="shop.html">Shop</a>
+      <a href="about.html">About</a>
+    </div>
+    <div class="right-section">
+      <a href="cart.html" class="cart-link active">
+        <i class="ti ti-shopping-cart" style="font-size:16px;color:#0EA5E9"></i>
+        <span class="cart-badge" id="cart-count" style="display:none">0</span>
+      </a>
+      <div id="auth-area"></div>
+    </div>
+  </div>
+
+  <div class="main">
+    <h1>Your cart</h1>
+    <div id="cart-content">Loading...</div>
+  </div>
+
+  <div class="undo-banner" id="undo-banner">
+    <span id="undo-text">Item removed from cart</span>
+    <button class="undo-link" onclick="undoDelete()">UNDO</button>
+  </div>
+
+  <script>
+    let lastDeleted = null
+    let undoTimer = null
+
+    async function renderAuthArea() {
+      const { data: { session } } = await supabaseClient.auth.getSession()
+      const area = document.getElementById('auth-area')
+      if (session) {
+        area.innerHTML = `<a href="dashboard.html" class="auth-link primary">Dashboard</a>`
+      } else {
+        area.innerHTML = `<a href="login.html" class="auth-link">Login</a>`
+      }
+    }
+
+    async function updateCartCount() {
+      const { data: { session } } = await supabaseClient.auth.getSession()
+      const badge = document.getElementById('cart-count')
+      if (!session) { badge.style.display = 'none'; return }
+      const { data, error } = await supabaseClient
+        .from('cart_items')
+        .select('quantity')
+        .eq('user_id', session.user.id)
+      if (error || !data || data.length === 0) { badge.style.display = 'none'; return }
+      const total = data.reduce((sum, item) => sum + item.quantity, 0)
+      badge.textContent = total
+      badge.style.display = 'flex'
+    }
+
+    async function loadCart() {
+      const { data: { session } } = await supabaseClient.auth.getSession()
+      const content = document.getElementById('cart-content')
+
+      if (!session) {
+        content.innerHTML = `
+          <div class="login-prompt">
+            <p>Please <a href="login.html">log in</a> to view your cart.</p>
+          </div>`
+        return
+      }
+
+      const { data: items, error } = await supabaseClient
+        .from('cart_items')
+        .select('id, quantity, products(id, name, category, price, icon)')
+        .eq('user_id', session.user.id)
+        .order('created_at')
+
+      if (error) {
+        content.innerHTML = `<p style="color:#ef4444;font-size:13px">Could not load your cart. Please try again.</p>`
+        return
+      }
+
+      if (!items || items.length === 0) {
+        content.innerHTML = `
+          <div class="empty-cart">
+            <i class="ti ti-shopping-cart-off"></i>
+            <p>Your cart is empty.</p>
+            <a href="shop.html">Browse products →</a>
+          </div>`
+        return
+      }
+
+      let total = 0
+      const rows = items.map(item => {
+        const p = item.products
+        const lineTotal = p.price * item.quantity
+        total += lineTotal
+        return `
+          <div class="cart-item" id="row-${item.id}">
+            <div class="cart-item-img"><i class="ti ${p.icon || 'ti-pill'}"></i></div>
+            <div class="cart-item-info">
+              <div class="cart-item-name">${p.name}</div>
+              <div class="cart-item-cat">${p.category}</div>
+            </div>
+            <div class="qty-control">
+              <button class="qty-btn" onclick="changeQty(${item.id}, ${item.quantity}, -1)">−</button>
+              <span class="qty-val">${item.quantity}</span>
+              <button class="qty-btn" onclick="changeQty(${item.id}, ${item.quantity}, 1)">+</button>
+            </div>
+            <div class="cart-item-price">₹${lineTotal}</div>
+            <button class="del-btn" onclick="deleteItem(${item.id}, '${p.name.replace(/'/g, "\\'")}', ${item.quantity}, ${p.id})">
+              <i class="ti ti-trash" style="font-size:15px"></i>
+            </button>
+          </div>`
+      }).join('')
+
+      content.innerHTML = rows + `
+        <div class="summary">
+          <div class="summary-row"><span>Subtotal</span><span>₹${total}</span></div>
+          <div class="summary-row"><span>Delivery</span><span>Free</span></div>
+          <div class="summary-total"><span>Total</span><span>₹${total}</span></div>
+          <button class="checkout-btn">Proceed to checkout</button>
+        </div>`
+    }
+
+    async function changeQty(cartId, currentQty, delta) {
+      const newQty = currentQty + delta
+      if (newQty < 1) return
+      await supabaseClient
+        .from('cart_items')
+        .update({ quantity: newQty })
+        .eq('id', cartId)
+      loadCart()
+      updateCartCount()
+    }
+
+    async function deleteItem(cartId, productName, quantity, productId) {
+      // Save it in memory before deleting, so Undo can restore it
+      lastDeleted = { cartId, productName, quantity, productId }
+
+      await supabaseClient
+        .from('cart_items')
+        .delete()
+        .eq('id', cartId)
+
+      loadCart()
+      updateCartCount()
+
+      const banner = document.getElementById('undo-banner')
+      document.getElementById('undo-text').textContent = `${productName} removed from cart`
+      banner.classList.add('show')
+
+      clearTimeout(undoTimer)
+      undoTimer = setTimeout(() => {
+        banner.classList.remove('show')
+        lastDeleted = null
+      }, 5000)
+    }
+
+    async function undoDelete() {
+      if (!lastDeleted) return
+      const { data: { session } } = await supabaseClient.auth.getSession()
+      if (!session) return
+
+      await supabaseClient
+        .from('cart_items')
+        .insert({
+          user_id: session.user.id,
+          product_id: lastDeleted.productId,
+          quantity: lastDeleted.quantity
+        })
+
+      document.getElementById('undo-banner').classList.remove('show')
+      lastDeleted = null
+      loadCart()
+      updateCartCount()
+    }
+
+    renderAuthArea()
+    updateCartCount()
+    loadCart()
+  </script>
+</body>
+</html>
