@@ -100,7 +100,7 @@
       const msg = document.getElementById('msg')
       const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password })
       if (error) { msg.textContent = error.message; msg.className = 'msg error' }
-      else { localStorage.setItem('token', data.session.access_token); window.location.href = 'dashboard.html' }
+      else { localStorage.setItem('token', data.session.access_token); window.location.href = 'index.html' }
     }
 
     async function signup() {
