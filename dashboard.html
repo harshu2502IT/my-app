@@ -9,10 +9,13 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { min-height: 100vh; background: #f0f4f8; font-family: sans-serif; }
+    a { text-decoration: none; }
     .topbar { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
     .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px; color: #0f172a; }
     .brand-icon { width: 34px; height: 34px; background: #0EA5E9; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
     .brand-icon i { color: #fff; font-size: 18px; }
+    .nav { display: flex; gap: 28px; font-size: 14px; color: #475569; }
+    .nav a:hover, .nav a.active { color: #0EA5E9; font-weight: 600; }
     .user-section { display: flex; align-items: center; gap: 12px; }
     .user-email { font-size: 13px; color: #475569; }
     .logout-btn { display: flex; align-items: center; gap: 5px; padding: 7px 14px; border: 1px solid #fecaca; background: #fff; border-radius: 8px; font-size: 13px; color: #ef4444; cursor: pointer; font-weight: 500; }
@@ -42,6 +45,11 @@
     <div class="brand">
       <div class="brand-icon"><i class="ti ti-heart-rate-monitor"></i></div>
       MediStore
+    </div>
+    <div class="nav">
+      <a href="index.html" class="active">Home</a>
+      <a href="shop.html">Shop</a>
+      <a href="about.html">About</a>
     </div>
     <div class="user-section">
       <span class="user-email" id="user-email">Loading...</span>
