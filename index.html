@@ -2,188 +2,986 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>MediStore – Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MediStore – Secure Medical Records Management</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="auth.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: sans-serif; background: #f0f4f8; color: #0f172a; }
-    a { text-decoration: none; color: inherit; }
 
-    .topbar { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
-    .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px; }
-    .brand-icon { width: 34px; height: 34px; background: #0EA5E9; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
-    .brand-icon i { color: #fff; font-size: 18px; }
-    .nav { display: flex; gap: 28px; font-size: 14px; color: #475569; }
-    .nav a:hover, .nav a.active { color: #0EA5E9; font-weight: 600; }
-    .right-section { display: flex; align-items: center; gap: 16px; }
-    .cart-link { position: relative; display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border: 1px solid #e2e8f0; border-radius: 8px; }
-    .cart-badge { position: absolute; top: -6px; right: -6px; background: #ef4444; color: #fff; font-size: 10px; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; }
-    .auth-link { font-size: 13px; padding: 7px 16px; border-radius: 8px; border: 1px solid #e2e8f0; }
-    .auth-link.primary { background: #0EA5E9; color: #fff; border: none; }
+    :root {
+      --sky: #0EA5E9;
+      --sky-dark: #0284C7;
+      --sky-light: #E0F2FE;
+      --navy: #0f172a;
+      --slate: #475569;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --bg: #f8fafc;
+      --white: #fff;
+      --green: #22c55e;
+      --green-bg: #F0FDF4;
+      --red: #dc2626;
+    }
 
-    .hero { max-width: 1000px; margin: 32px auto; padding: 0 24px; }
-    .hero-card { background: linear-gradient(135deg, #0EA5E9, #0284C7); border-radius: 16px; padding: 48px 40px; color: #fff; }
-    .hero-card h1 { font-size: 30px; margin-bottom: 10px; }
-    .hero-card p { font-size: 15px; opacity: 0.92; margin-bottom: 22px; max-width: 480px; }
-    .hero-btn { background: #fff; color: #0EA5E9; font-size: 14px; font-weight: 600; padding: 11px 22px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--navy);
+      min-height: 100vh;
+    }
 
-    .features { max-width: 1000px; margin: 0 auto 32px; padding: 0 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-    .feat { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; text-align: center; }
-    .feat i { font-size: 28px; color: #0EA5E9; margin-bottom: 10px; display: block; }
-    .feat-t { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
-    .feat-d { font-size: 12px; color: #64748b; }
+    /* ── NAV ── */
+    nav {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .nav-logo {
+      width: 38px;
+      height: 38px;
+      background: var(--sky);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .nav-logo i { color: var(--white); font-size: 20px; }
+    .nav-brand-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .nav-links a {
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--slate);
+      padding: 6px 14px;
+      border-radius: 8px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .nav-links a:hover { background: var(--bg); color: var(--sky); }
+    .nav-cta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-outline {
+      padding: 8px 18px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--slate);
+      background: var(--white);
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 0.15s, color 0.15s;
+      display: inline-flex;
+      align-items: center;
+    }
+    .btn-outline:hover { border-color: var(--sky); color: var(--sky); }
+    .btn-primary {
+      padding: 8px 18px;
+      background: var(--sky);
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--white);
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s;
+      display: inline-flex;
+      align-items: center;
+    }
+    .btn-primary:hover { background: var(--sky-dark); }
 
-    .section-title { max-width: 1000px; margin: 0 auto 16px; padding: 0 24px; font-size: 18px; font-weight: 700; display: flex; align-items: center; justify-content: space-between; }
-    .section-title a { font-size: 13px; color: #0EA5E9; font-weight: 500; }
-    .prod-grid { max-width: 1000px; margin: 0 auto 48px; padding: 0 24px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
-    .prod-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; }
-    .prod-img { width: 100%; height: 80px; background: #EFF6FF; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
-    .prod-img i { font-size: 30px; color: #0EA5E9; }
-    .prod-name { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
-    .prod-cat { font-size: 11px; color: #64748b; margin-bottom: 10px; }
-    .prod-bottom { display: flex; align-items: center; justify-content: space-between; }
-    .prod-price { font-size: 15px; font-weight: 700; color: #0EA5E9; }
-    .add-btn { background: #0EA5E9; color: #fff; border: none; border-radius: 6px; font-size: 12px; padding: 7px 10px; display: flex; align-items: center; gap: 4px; cursor: pointer; }
-    .add-btn:hover { background: #0284C7; }
-    .add-btn:disabled { background: #94a3b8; cursor: default; }
+    /* ── Profile (logged-in navbar) ── */
+    .nav-profile {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 10px 6px 6px;
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      background: var(--bg);
+      cursor: default;
+    }
+    .nav-profile.show { display: flex; }
+    .profile-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--sky);
+      color: var(--white);
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      text-transform: uppercase;
+    }
+    .profile-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--navy);
+      max-width: 120px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .profile-logout {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      padding: 2px;
+    }
+    .profile-logout:hover { color: var(--red); }
 
-    .toast { position: fixed; bottom: 24px; right: 24px; background: #0f172a; color: #fff; padding: 12px 18px; border-radius: 10px; font-size: 13px; display: none; align-items: center; gap: 8px; z-index: 100; }
-    .toast.show { display: flex; }
-    .toast i { color: #22c55e; }
+    /* ── MODAL OVERLAY ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.5rem 2rem;
+      width: 100%;
+      max-width: 420px;
+      position: relative;
+      animation: modalIn 0.2s ease;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(-16px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .modal-close {
+      position: absolute;
+      top: 1rem; right: 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 18px;
+      transition: background 0.15s;
+    }
+    .modal-close:hover { background: var(--border); }
+
+    .modal-logo {
+      width: 48px; height: 48px;
+      background: var(--sky);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.25rem;
+    }
+    .modal-logo i { color: #fff; font-size: 24px; }
+    .modal-card h2 { text-align: center; font-size: 22px; font-weight: 700; color: var(--navy); margin-bottom: 0.2rem; }
+    .modal-subtitle { text-align: center; font-size: 13px; color: var(--muted); margin-bottom: 1rem; }
+    .modal-badge {
+      display: flex; align-items: center; gap: 5px;
+      background: #EFF6FF; color: #1D4ED8;
+      font-size: 11px; font-weight: 500;
+      padding: 4px 12px; border-radius: 20px;
+      width: fit-content; margin: 0 auto 1.5rem;
+    }
+
+    /* tabs */
+    .tabs { display: flex; background: #f1f5f9; border-radius: 8px; padding: 3px; margin-bottom: 1.5rem; gap: 3px; }
+    .tab { flex: 1; padding: 8px; border: none; background: transparent; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; color: var(--muted); transition: all 0.15s; }
+    .tab.active { background: #fff; color: var(--sky); border: 1px solid var(--border); }
+
+    /* form */
+    .modal-field { margin-bottom: 0.9rem; }
+    .modal-field label { display: block; font-size: 12px; font-weight: 500; color: var(--slate); margin-bottom: 5px; }
+    .input-wrap { position: relative; }
+    .input-wrap i { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); font-size: 15px; color: #94a3b8; pointer-events: none; }
+    .input-wrap input { width: 100%; padding: 10px 12px 10px 36px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; color: var(--navy); outline: none; background: #fff; font-family: inherit; transition: border-color 0.15s, box-shadow 0.15s; }
+    .input-wrap input:focus { border-color: var(--sky); box-shadow: 0 0 0 3px rgba(14,165,233,0.12); }
+    .input-wrap input.invalid { border-color: var(--red); }
+    .input-wrap input.invalid:focus { box-shadow: 0 0 0 3px rgba(220,38,38,0.12); }
+
+    .field-error {
+      display: none;
+      font-size: 11.5px;
+      color: var(--red);
+      margin-top: 4px;
+    }
+    .field-error.show { display: block; }
+
+    .modal-btn { width: 100%; padding: 11px; background: var(--sky); color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 0.5rem; font-family: inherit; transition: background 0.15s; }
+    .modal-btn:hover { background: var(--sky-dark); }
+    .modal-btn:disabled { background: #94a3b8; cursor: not-allowed; }
+
+    .modal-secure { display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 11px; color: var(--muted); margin-top: 1rem; }
+    .modal-secure i { color: var(--green); font-size: 13px; }
+
+    .modal-msg { margin-top: 1rem; padding: 10px 14px; border-radius: 8px; font-size: 13px; text-align: center; display: none; }
+    .modal-msg.error { background: #FEF2F2; color: #b91c1c; display: block; }
+    .modal-msg.success { background: #F0FDF4; color: #15803d; display: block; }
+
+    /* ── HERO ── */
+    .hero {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 5rem 1.5rem 4rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--green-bg);
+      color: #15803d;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 20px;
+      margin-bottom: 1.25rem;
+    }
+    .hero-badge i { font-size: 14px; color: var(--green); }
+    .hero h1 { font-size: 3rem; font-weight: 800; line-height: 1.15; color: var(--navy); margin-bottom: 1.25rem; letter-spacing: -0.5px; }
+    .hero h1 span { color: var(--sky); }
+    .hero p { font-size: 1.05rem; color: var(--muted); line-height: 1.7; margin-bottom: 2rem; max-width: 480px; }
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    .hero-actions button {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 12px 22px; border-radius: 10px; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: all 0.15s; border: none; font-family: inherit;
+    }
+    .hero-actions .ha-primary { background: var(--sky); color: var(--white); }
+    .hero-actions .ha-primary:hover { background: var(--sky-dark); }
+    .hero-actions .ha-secondary { background: var(--white); color: var(--slate); border: 1px solid var(--border); }
+    .hero-actions .ha-secondary:hover { border-color: var(--sky); color: var(--sky); }
+
+    .hero-stats { display: flex; gap: 12px; margin-top: 2.5rem; flex-wrap: wrap; }
+    .stat-pill { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 10px 16px; display: flex; align-items: center; gap: 8px; }
+    .stat-pill i { color: var(--sky); font-size: 18px; }
+    .stat-pill-val { font-size: 15px; font-weight: 700; color: var(--navy); }
+    .stat-pill-label { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+    .hero-visual { background: var(--white); border: 1px solid var(--border); border-radius: 20px; padding: 1.5rem; box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
+    .hv-header { display: flex; align-items: center; gap: 8px; padding-bottom: 1rem; border-bottom: 1px solid var(--border); margin-bottom: 1rem; }
+    .hv-header i { color: var(--sky); font-size: 18px; }
+    .hv-header span { font-size: 13px; font-weight: 600; color: var(--navy); }
+    .hv-header .badge-live { margin-left: auto; background: var(--green-bg); color: #15803d; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; display: flex; align-items: center; gap: 4px; }
+    .hv-header .badge-live::before { content: ''; width: 6px; height: 6px; background: var(--green); border-radius: 50%; display: inline-block; }
+    .patient-card { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; margin-bottom: 10px; transition: border-color 0.15s; }
+    .patient-card:hover { border-color: var(--sky); }
+    .avatar { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: var(--white); flex-shrink: 0; }
+    .patient-info { flex: 1; }
+    .patient-name { font-size: 13px; font-weight: 600; color: var(--navy); }
+    .patient-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .patient-status { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 20px; }
+    .status-active { background: var(--green-bg); color: #15803d; }
+    .status-review { background: #FFF7ED; color: #c2410c; }
+    .status-scheduled { background: var(--sky-light); color: #0369a1; }
+    .hv-divider { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+    .hv-metrics { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .metric-box { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; text-align: center; }
+    .metric-val { font-size: 18px; font-weight: 800; color: var(--navy); }
+    .metric-label { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+    /* ── SECTIONS ── */
+    .section { max-width: 1100px; margin: 0 auto; padding: 4rem 1.5rem; }
+    .section-label { font-size: 12px; font-weight: 600; color: var(--sky); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem; }
+    .section-title { font-size: 2rem; font-weight: 800; color: var(--navy); margin-bottom: 0.75rem; letter-spacing: -0.3px; }
+    .section-sub { font-size: 1rem; color: var(--muted); line-height: 1.7; max-width: 520px; }
+    .section-head { margin-bottom: 2.5rem; }
+
+    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+    .feature-card { background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; transition: border-color 0.15s, box-shadow 0.15s; }
+    .feature-card:hover { border-color: var(--sky); box-shadow: 0 4px 16px rgba(14,165,233,0.1); }
+    .feature-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; }
+    .feature-icon i { font-size: 22px; }
+    .feature-card h3 { font-size: 15px; font-weight: 700; color: var(--navy); margin-bottom: 0.4rem; }
+    .feature-card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+    .how-bg { background: var(--white); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .steps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+    .step { display: flex; flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+    .step-num { width: 36px; height: 36px; background: var(--sky-light); color: var(--sky); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800; }
+    .step h4 { font-size: 14px; font-weight: 700; color: var(--navy); }
+    .step p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+    .compliance-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+    .comp-card { background: var(--white); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem; text-align: center; }
+    .comp-card i { font-size: 28px; color: var(--sky); margin-bottom: 0.5rem; display: block; }
+    .comp-card h4 { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 0.25rem; }
+    .comp-card p { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+    .cta-banner { background: linear-gradient(135deg, #0EA5E9 0%, #0369a1 100%); border-radius: 20px; padding: 3rem 2rem; text-align: center; color: var(--white); max-width: 1100px; margin: 0 auto 4rem; }
+    .cta-banner h2 { font-size: 2rem; font-weight: 800; margin-bottom: 0.75rem; letter-spacing: -0.3px; }
+    .cta-banner p { font-size: 1rem; opacity: 0.88; margin-bottom: 2rem; }
+    .cta-banner-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-white { background: var(--white); color: var(--sky-dark); border: none; padding: 12px 24px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; transition: opacity 0.15s; font-family: inherit; }
+    .btn-white:hover { opacity: 0.92; }
+    .btn-ghost { background: transparent; color: var(--white); border: 1.5px solid rgba(255,255,255,0.5); padding: 12px 24px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; transition: border-color 0.15s; font-family: inherit; }
+    .btn-ghost:hover { border-color: var(--white); }
+
+    footer { border-top: 1px solid var(--border); background: var(--white); }
+    .footer-inner { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .footer-brand { display: flex; align-items: center; gap: 8px; }
+    .footer-logo { width: 32px; height: 32px; background: var(--sky); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+    .footer-logo i { color: var(--white); font-size: 16px; }
+    .footer-brand span { font-size: 15px; font-weight: 700; color: var(--navy); }
+    .footer-copy { font-size: 12px; color: var(--muted); }
+    .footer-links { display: flex; gap: 1.25rem; }
+    .footer-links a { font-size: 12px; color: var(--muted); text-decoration: none; }
+    .footer-links a:hover { color: var(--sky); }
+
+    @media (max-width: 768px) {
+      .hero { grid-template-columns: 1fr; padding: 3rem 1.25rem 2rem; gap: 2rem; }
+      .hero h1 { font-size: 2.1rem; }
+      .hero-visual { display: none; }
+      .features-grid { grid-template-columns: 1fr; }
+      .steps-grid { grid-template-columns: 1fr 1fr; }
+      .compliance-grid { grid-template-columns: 1fr 1fr; }
+      .nav-links { display: none; }
+      .cta-banner { margin: 0 1rem 3rem; padding: 2rem 1.25rem; }
+      .cta-banner h2 { font-size: 1.5rem; }
+      .footer-inner { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+      .profile-name { max-width: 80px; }
+    }
   </style>
 </head>
 <body>
-  <div class="topbar">
-    <div class="brand"><div class="brand-icon"><i class="ti ti-heart-rate-monitor"></i></div>MediStore</div>
-    <div class="nav">
-      <a href="index.html" class="active">Home</a>
-      <a href="shop.html">Shop</a>
-      <a href="about.html">About</a>
+
+  <!-- ── AUTH MODAL ── -->
+  <div class="modal-overlay" id="authModal">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeModal()"><i class="ti ti-x"></i></button>
+      <div class="modal-logo"><i class="ti ti-heart-rate-monitor"></i></div>
+      <h2>MediStore</h2>
+      <p class="modal-subtitle">Secure medical records management</p>
+      <div class="modal-badge"><i class="ti ti-shield-check"></i> HIPAA Compliant</div>
+
+      <div class="tabs">
+        <button class="tab" id="tab-login" onclick="setTab('login')">Login</button>
+        <button class="tab" id="tab-signup" onclick="setTab('signup')">Sign Up</button>
+      </div>
+
+      <!-- Login Form -->
+      <div id="modal-login-form">
+        <div class="modal-field">
+          <label>Email address</label>
+          <div class="input-wrap">
+            <i class="ti ti-mail"></i>
+            <input type="email" id="login-email" placeholder="doctor@hospital.com" />
+          </div>
+          <p class="field-error" id="login-email-error"></p>
+        </div>
+        <div class="modal-field">
+          <label>Password</label>
+          <div class="input-wrap">
+            <i class="ti ti-lock"></i>
+            <input type="password" id="login-password" placeholder="••••••••" />
+          </div>
+          <p class="field-error" id="login-password-error"></p>
+        </div>
+        <button class="modal-btn" id="login-btn" onclick="login()">Sign in securely</button>
+      </div>
+
+      <!-- Signup Form -->
+      <div id="modal-signup-form" style="display:none">
+        <div class="modal-field">
+          <label>Full name</label>
+          <div class="input-wrap">
+            <i class="ti ti-user"></i>
+            <input type="text" id="signup-name" placeholder="Dr. Jane Doe" />
+          </div>
+          <p class="field-error" id="signup-name-error"></p>
+        </div>
+        <div class="modal-field">
+          <label>Email address</label>
+          <div class="input-wrap">
+            <i class="ti ti-mail"></i>
+            <input type="email" id="signup-email" placeholder="doctor@hospital.com" />
+          </div>
+          <p class="field-error" id="signup-email-error"></p>
+        </div>
+        <div class="modal-field">
+          <label>Password</label>
+          <div class="input-wrap">
+            <i class="ti ti-lock"></i>
+            <input type="password" id="signup-password" placeholder="Min. 6 characters" />
+          </div>
+          <p class="field-error" id="signup-password-error"></p>
+        </div>
+        <button class="modal-btn" id="signup-btn" onclick="signup()">Create secure account</button>
+      </div>
+
+      <p class="modal-msg" id="modal-msg"></p>
+      <div class="modal-secure"><i class="ti ti-lock"></i> Your data is encrypted and secure</div>
     </div>
-    <div class="right-section">
-      <a href="cart.html" class="cart-link">
-        <i class="ti ti-shopping-cart" style="font-size:16px;color:#475569"></i>
-        <span class="cart-badge" id="cart-count" style="display:none">0</span>
+  </div>
+
+  <!-- ── NAV ── -->
+  <nav>
+    <div class="nav-inner">
+      <a class="nav-brand" href="index.html">
+        <div class="nav-logo"><i class="ti ti-heart-rate-monitor"></i></div>
+        <span class="nav-brand-name">MediStore</span>
       </a>
-      <div id="auth-area"></div>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#compliance">Security</a>
+      </div>
+      <div class="nav-cta" id="nav-cta">
+        <button class="btn-outline" onclick="openModal('login')">Log in</button>
+        <button class="btn-primary" onclick="openModal('signup')">Get started</button>
+      </div>
+      <div class="nav-profile" id="nav-profile">
+        <div class="profile-avatar" id="profile-avatar">U</div>
+        <span class="profile-name" id="profile-name">User</span>
+        <button class="profile-logout" title="Log out" onclick="logout()"><i class="ti ti-logout"></i></button>
+      </div>
     </div>
-  </div>
+  </nav>
 
+  <!-- ── HERO ── -->
   <div class="hero">
-    <div class="hero-card">
-      <h1>Your trusted medical pharmacy</h1>
-      <p>Genuine medicines, supplements, and devices — stored securely and delivered to your door.</p>
-      <a href="shop.html" class="hero-btn">Shop now <i class="ti ti-arrow-right"></i></a>
-    </div>
-  </div>
-
-  <div class="features">
-    <div class="feat"><i class="ti ti-shield-check"></i><div class="feat-t">Verified products</div><div class="feat-d">100% genuine medicines</div></div>
-    <div class="feat"><i class="ti ti-truck-delivery"></i><div class="feat-t">Fast delivery</div><div class="feat-d">Same-day in select areas</div></div>
-    <div class="feat"><i class="ti ti-lock"></i><div class="feat-t">Secure checkout</div><div class="feat-d">Your data is encrypted</div></div>
-  </div>
-
-  <div class="section-title">Popular products <a href="shop.html">View all →</a></div>
-  <div class="prod-grid" id="product-grid"></div>
-
-  <div class="toast" id="toast"><i class="ti ti-circle-check"></i><span id="toast-text">Added to cart</span></div>
-
-  <script>
-    async function renderAuthArea() {
-      const { data: { session } } = await supabaseClient.auth.getSession()
-      const area = document.getElementById('auth-area')
-      if (session) {
-        area.innerHTML = `<a href="dashboard.html" class="auth-link primary">Dashboard</a>`
-      } else {
-        area.innerHTML = `<a href="login.html" class="auth-link">Login</a>`
-      }
-    }
-
-    async function updateCartCount() {
-      const { data: { session } } = await supabaseClient.auth.getSession()
-      const badge = document.getElementById('cart-count')
-      if (!session) { badge.style.display = 'none'; return }
-      const { data, error } = await supabaseClient
-        .from('cart_items')
-        .select('quantity')
-        .eq('user_id', session.user.id)
-      if (error || !data || data.length === 0) { badge.style.display = 'none'; return }
-      const total = data.reduce((sum, item) => sum + item.quantity, 0)
-      badge.textContent = total
-      badge.style.display = 'flex'
-    }
-
-    function showToast(text) {
-      const toast = document.getElementById('toast')
-      document.getElementById('toast-text').textContent = text
-      toast.classList.add('show')
-      setTimeout(() => toast.classList.remove('show'), 2200)
-    }
-
-    async function addToCart(productId, btn) {
-      const { data: { session } } = await supabaseClient.auth.getSession()
-      if (!session) {
-        window.location.href = 'login.html'
-        return
-      }
-
-      btn.disabled = true
-      btn.textContent = 'Adding...'
-
-      const { data: existing } = await supabaseClient
-        .from('cart_items')
-        .select('id, quantity')
-        .eq('user_id', session.user.id)
-        .eq('product_id', productId)
-        .maybeSingle()
-
-      if (existing) {
-        await supabaseClient
-          .from('cart_items')
-          .update({ quantity: existing.quantity + 1 })
-          .eq('id', existing.id)
-      } else {
-        await supabaseClient
-          .from('cart_items')
-          .insert({ user_id: session.user.id, product_id: productId, quantity: 1 })
-      }
-
-      btn.disabled = false
-      btn.innerHTML = '<i class="ti ti-plus" style="font-size:13px"></i>Add'
-      showToast('Added to cart')
-      updateCartCount()
-    }
-
-    async function loadProducts() {
-      const { data: products, error } = await supabaseClient
-        .from('products')
-        .select('*')
-        .limit(8)
-
-      const grid = document.getElementById('product-grid')
-      if (error || !products) {
-        grid.innerHTML = '<p style="color:#64748b;font-size:13px">Could not load products.</p>'
-        return
-      }
-
-      grid.innerHTML = products.map(p => `
-        <div class="prod-card">
-          <div class="prod-img"><i class="ti ${p.icon || 'ti-pill'}"></i></div>
-          <div class="prod-name">${p.name}</div>
-          <div class="prod-cat">${p.category}</div>
-          <div class="prod-bottom">
-            <span class="prod-price">₹${p.price}</span>
-            <button class="add-btn" onclick="addToCart(${p.id}, this)"><i class="ti ti-plus" style="font-size:13px"></i>Add</button>
+    <div>
+      <div class="hero-badge"><i class="ti ti-shield-check"></i> HIPAA Compliant</div>
+      <h1>Medical records,<br><span>secure and instant.</span></h1>
+      <p>MediStore gives clinics and hospitals a single encrypted workspace to store, access, and share patient records — from any device, in seconds.</p>
+      <div class="hero-actions">
+        <button class="ha-primary" onclick="openModal('signup')"><i class="ti ti-user-plus"></i> Start for free</button>
+        <button class="ha-secondary" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})"><i class="ti ti-play"></i> See how it works</button>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-pill">
+          <i class="ti ti-users"></i>
+          <div>
+            <div class="stat-pill-val">12,400+</div>
+            <div class="stat-pill-label">Patients managed</div>
           </div>
         </div>
-      `).join('')
+        <div class="stat-pill">
+          <i class="ti ti-lock"></i>
+          <div>
+            <div class="stat-pill-val">AES-256</div>
+            <div class="stat-pill-label">Encryption</div>
+          </div>
+        </div>
+        <div class="stat-pill">
+          <i class="ti ti-clock"></i>
+          <div>
+            <div class="stat-pill-val">99.9%</div>
+            <div class="stat-pill-label">Uptime SLA</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="hv-header">
+        <i class="ti ti-layout-dashboard"></i>
+        <span>Patient Dashboard</span>
+        <div class="badge-live">Live</div>
+      </div>
+      <div class="patient-card">
+        <div class="avatar" style="background:#0EA5E9">RK</div>
+        <div class="patient-info">
+          <div class="patient-name">Ravi Kumar</div>
+          <div class="patient-meta">ID #10042 · Cardiology</div>
+        </div>
+        <span class="patient-status status-active">Active</span>
+      </div>
+      <div class="patient-card">
+        <div class="avatar" style="background:#8b5cf6">PS</div>
+        <div class="patient-info">
+          <div class="patient-name">Priya Sharma</div>
+          <div class="patient-meta">ID #10039 · Neurology</div>
+        </div>
+        <span class="patient-status status-review">Review</span>
+      </div>
+      <div class="patient-card">
+        <div class="avatar" style="background:#f59e0b">AM</div>
+        <div class="patient-info">
+          <div class="patient-name">Anil Mehta</div>
+          <div class="patient-meta">ID #10055 · Orthopedics</div>
+        </div>
+        <span class="patient-status status-scheduled">Scheduled</span>
+      </div>
+      <hr class="hv-divider">
+      <div class="hv-metrics">
+        <div class="metric-box">
+          <div class="metric-val">248</div>
+          <div class="metric-label">Records Today</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-val">3</div>
+          <div class="metric-label">Pending</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-val">100%</div>
+          <div class="metric-label">Encrypted</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FEATURES ── -->
+  <div id="features" class="section">
+    <div class="section-head">
+      <div class="section-label">Features</div>
+      <div class="section-title">Everything your clinic needs</div>
+      <div class="section-sub">Built for doctors, nurses, and administrators who need speed without sacrificing compliance.</div>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#EFF6FF"><i class="ti ti-file-medical" style="color:#2563EB"></i></div>
+        <h3>Unified Patient Records</h3>
+        <p>All history, lab results, prescriptions, and notes in one place. No more hunting across systems.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#FEF3C7"><i class="ti ti-search" style="color:#D97706"></i></div>
+        <h3>Instant Search</h3>
+        <p>Find any patient or record in under a second. Full-text search across all fields and documents.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#F0FDF4"><i class="ti ti-share" style="color:#16a34a"></i></div>
+        <h3>Secure Sharing</h3>
+        <p>Share records with specialists or labs using time-limited, permission-controlled links.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#FDF2F8"><i class="ti ti-bell" style="color:#9333ea"></i></div>
+        <h3>Smart Alerts</h3>
+        <p>Get notified on critical lab values, prescription refills, or upcoming appointments automatically.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#FFF1F2"><i class="ti ti-chart-bar" style="color:#e11d48"></i></div>
+        <h3>Analytics & Reports</h3>
+        <p>Track patient outcomes, department load, and compliance status with built-in dashboards.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#E0F2FE"><i class="ti ti-device-mobile" style="color:#0369a1"></i></div>
+        <h3>Mobile Ready</h3>
+        <p>Access records from any device. The full experience works seamlessly on phones and tablets.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── HOW IT WORKS ── -->
+  <div id="how-it-works" class="how-bg">
+    <div class="section">
+      <div class="section-head">
+        <div class="section-label">How it works</div>
+        <div class="section-title">Up and running in minutes</div>
+        <div class="section-sub">No lengthy onboarding. MediStore fits into your existing workflow from day one.</div>
+      </div>
+      <div class="steps-grid">
+        <div class="step">
+          <div class="step-num">1</div>
+          <h4>Create your account</h4>
+          <p>Sign up with your work email. Your account is isolated and encrypted from the start.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <h4>Import patient data</h4>
+          <p>Upload existing records via CSV or connect your current EHR system through our API.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <h4>Invite your team</h4>
+          <p>Add doctors, nurses, and staff with role-based permissions for each department.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <h4>Start managing</h4>
+          <p>Search, update, and share records securely. Your team is ready to go immediately.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── COMPLIANCE ── -->
+  <div id="compliance" class="section">
+    <div class="section-head">
+      <div class="section-label">Security & Compliance</div>
+      <div class="section-title">Built with trust at the core</div>
+      <div class="section-sub">MediStore meets the strictest healthcare data standards, so you never have to worry about compliance.</div>
+    </div>
+    <div class="compliance-grid">
+      <div class="comp-card">
+        <i class="ti ti-shield-check"></i>
+        <h4>HIPAA Compliant</h4>
+        <p>Full compliance with U.S. healthcare privacy regulations and audit-ready logs.</p>
+      </div>
+      <div class="comp-card">
+        <i class="ti ti-lock"></i>
+        <h4>AES-256 Encryption</h4>
+        <p>All data encrypted at rest and in transit. Keys are managed per organization.</p>
+      </div>
+      <div class="comp-card">
+        <i class="ti ti-history"></i>
+        <h4>Audit Trail</h4>
+        <p>Every access and change is logged with timestamps, user ID, and IP address.</p>
+      </div>
+      <div class="comp-card">
+        <i class="ti ti-server"></i>
+        <h4>99.9% Uptime</h4>
+        <p>Redundant infrastructure with automatic failover across multiple data centers.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CTA BANNER ── -->
+  <div class="cta-banner">
+    <h2>Ready to modernize your records?</h2>
+    <p>Join hundreds of clinics already using MediStore to deliver better, faster patient care.</p>
+    <div class="cta-banner-actions">
+      <button class="btn-white" onclick="openModal('signup')"><i class="ti ti-user-plus"></i> Create free account</button>
+      <button class="btn-ghost" onclick="openModal('login')"><i class="ti ti-login"></i> Sign in</button>
+    </div>
+  </div>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="footer-logo"><i class="ti ti-heart-rate-monitor"></i></div>
+        <span>MediStore</span>
+      </div>
+      <span class="footer-copy">© 2025 MediStore. All rights reserved.</span>
+      <div class="footer-links">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Support</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Supabase (loaded from auth.js or inline) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js"></script>
+
+  <script>
+    /* ──────────────────────────────────────────────
+       Validation helpers
+    ────────────────────────────────────────────── */
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    function setFieldError(inputId, errorId, message) {
+      const input = document.getElementById(inputId);
+      const error = document.getElementById(errorId);
+      if (message) {
+        input.classList.add('invalid');
+        error.textContent = message;
+        error.classList.add('show');
+      } else {
+        input.classList.remove('invalid');
+        error.textContent = '';
+        error.classList.remove('show');
+      }
     }
 
-    renderAuthArea()
-    updateCartCount()
-    loadProducts()
+    function clearFormErrors(ids) {
+      ids.forEach(({ input, error }) => setFieldError(input, error, ''));
+    }
+
+    function validateLoginForm() {
+      let valid = true;
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+
+      if (!email) {
+        setFieldError('login-email', 'login-email-error', 'Email is required.');
+        valid = false;
+      } else if (!EMAIL_RE.test(email)) {
+        setFieldError('login-email', 'login-email-error', 'Enter a valid email address.');
+        valid = false;
+      } else {
+        setFieldError('login-email', 'login-email-error', '');
+      }
+
+      if (!password) {
+        setFieldError('login-password', 'login-password-error', 'Password is required.');
+        valid = false;
+      } else {
+        setFieldError('login-password', 'login-password-error', '');
+      }
+
+      return valid;
+    }
+
+    function validateSignupForm() {
+      let valid = true;
+      const name = document.getElementById('signup-name').value.trim();
+      const email = document.getElementById('signup-email').value.trim();
+      const password = document.getElementById('signup-password').value;
+
+      if (!name) {
+        setFieldError('signup-name', 'signup-name-error', 'Full name is required.');
+        valid = false;
+      } else if (name.length < 2) {
+        setFieldError('signup-name', 'signup-name-error', 'Name is too short.');
+        valid = false;
+      } else {
+        setFieldError('signup-name', 'signup-name-error', '');
+      }
+
+      if (!email) {
+        setFieldError('signup-email', 'signup-email-error', 'Email is required.');
+        valid = false;
+      } else if (!EMAIL_RE.test(email)) {
+        setFieldError('signup-email', 'signup-email-error', 'Enter a valid email address.');
+        valid = false;
+      } else {
+        setFieldError('signup-email', 'signup-email-error', '');
+      }
+
+      if (!password) {
+        setFieldError('signup-password', 'signup-password-error', 'Password is required.');
+        valid = false;
+      } else if (password.length < 6) {
+        setFieldError('signup-password', 'signup-password-error', 'Password must be at least 6 characters.');
+        valid = false;
+      } else {
+        setFieldError('signup-password', 'signup-password-error', '');
+      }
+
+      return valid;
+    }
+
+    /* ── Modal helpers ── */
+    function openModal(tab) {
+      document.getElementById('authModal').classList.add('open');
+      setTab(tab);
+      document.getElementById('modal-msg').className = 'modal-msg';
+    }
+
+    function closeModal() {
+      document.getElementById('authModal').classList.remove('open');
+      document.getElementById('modal-msg').className = 'modal-msg';
+    }
+
+    // Close on backdrop click
+    document.getElementById('authModal').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    function setTab(t) {
+      document.getElementById('tab-login').classList.toggle('active', t === 'login');
+      document.getElementById('tab-signup').classList.toggle('active', t === 'signup');
+      document.getElementById('modal-login-form').style.display  = t === 'login'  ? 'block' : 'none';
+      document.getElementById('modal-signup-form').style.display = t === 'signup' ? 'block' : 'none';
+      document.getElementById('modal-msg').className = 'modal-msg';
+      clearFormErrors([
+        { input: 'login-email', error: 'login-email-error' },
+        { input: 'login-password', error: 'login-password-error' },
+        { input: 'signup-name', error: 'signup-name-error' },
+        { input: 'signup-email', error: 'signup-email-error' },
+        { input: 'signup-password', error: 'signup-password-error' }
+      ]);
+    }
+
+    /* ── Navbar profile rendering ── */
+    function getInitials(name) {
+      if (!name) return 'U';
+      const parts = name.trim().split(/\s+/);
+      if (parts.length === 1) return parts[0].substring(0, 2);
+      return (parts[0][0] + parts[parts.length - 1][0]);
+    }
+
+    function showProfileInNav(name) {
+      document.getElementById('nav-cta').style.display = 'none';
+      document.getElementById('nav-profile').classList.add('show');
+      document.getElementById('profile-name').textContent = name || 'User';
+      document.getElementById('profile-avatar').textContent = getInitials(name);
+    }
+
+    function showGuestNav() {
+      document.getElementById('nav-cta').style.display = 'flex';
+      document.getElementById('nav-profile').classList.remove('show');
+    }
+
+    /* ── Fetch profile name from 'profiles' table ── */
+    async function loadProfileForUser(userId, fallbackEmail) {
+      try {
+        const { data, error } = await supabaseClient
+          .from('profiles')
+          .select('name')
+          .eq('id', userId)
+          .single();
+
+        if (error || !data) {
+          showProfileInNav(fallbackEmail);
+          return;
+        }
+        showProfileInNav(data.name || fallbackEmail);
+      } catch (e) {
+        showProfileInNav(fallbackEmail);
+      }
+    }
+
+    /* ── Auth actions ── */
+    async function login() {
+      const msg = document.getElementById('modal-msg');
+      msg.className = 'modal-msg';
+
+      if (!validateLoginForm()) return;
+
+      const email    = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      const btn = document.getElementById('login-btn');
+      btn.disabled = true;
+      btn.textContent = 'Signing in...';
+
+      try {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+        if (error) {
+          msg.textContent = error.message || 'Invalid email or password.';
+          msg.className = 'modal-msg error';
+          setFieldError('login-password', 'login-password-error', 'Incorrect email or password.');
+          return;
+        }
+
+        localStorage.setItem('token', data.session.access_token);
+        msg.textContent = 'Login successful!';
+        msg.className = 'modal-msg success';
+
+        await loadProfileForUser(data.user.id, email);
+
+        setTimeout(() => {
+          closeModal();
+        }, 800);
+      } catch (e) {
+        msg.textContent = 'Login failed. Please try again.';
+        msg.className = 'modal-msg error';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Sign in securely';
+      }
+    }
+
+    async function signup() {
+      const msg = document.getElementById('modal-msg');
+      msg.className = 'modal-msg';
+
+      if (!validateSignupForm()) return;
+
+      const name     = document.getElementById('signup-name').value.trim();
+      const email    = document.getElementById('signup-email').value.trim();
+      const password = document.getElementById('signup-password').value;
+      const btn = document.getElementById('signup-btn');
+      btn.disabled = true;
+      btn.textContent = 'Creating account...';
+
+      try {
+        const { data, error } = await supabaseClient.auth.signUp({ email, password });
+
+        if (error) {
+          msg.textContent = error.message;
+          msg.className = 'modal-msg error';
+          return;
+        }
+
+        // Store the user's name in the 'profiles' table
+        if (data.user) {
+          const { error: profileError } = await supabaseClient
+            .from('profiles')
+            .upsert({ id: data.user.id, name: name, email: email });
+
+          if (profileError) {
+            console.error('Could not save profile:', profileError.message);
+          }
+        }
+
+        msg.textContent = 'Account created! You can now log in.';
+        msg.className = 'modal-msg success';
+
+        setTimeout(() => {
+          setTab('login');
+          document.getElementById('login-email').value = email;
+        }, 1000);
+      } catch (e) {
+        msg.textContent = 'Sign up failed. Please try again.';
+        msg.className = 'modal-msg error';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Create secure account';
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      supabaseClient.auth.signOut();
+      showGuestNav();
+    }
+
+    /* ── Restore session on page load ── */
+    async function restoreSession() {
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session && session.user) {
+          await loadProfileForUser(session.user.id, session.user.email);
+        } else {
+          showGuestNav();
+        }
+      } catch (e) {
+        showGuestNav();
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', restoreSession);
   </script>
 </body>
 </html>
